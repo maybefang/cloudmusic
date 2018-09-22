@@ -91,6 +91,9 @@ public class NetMusicPager extends BasePage {
                         }
 
                     }
+                    if (!cnbrassList.isEmpty()){
+                        cnbrassList.clear();
+                    }
                     cnbrassList.add(itemCnbrass);
                     handler.sendEmptyMessage(FLUSH);
                 } catch (IOException e) {
