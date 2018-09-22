@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/local_music"
+            android:icon="@drawable/local_music"
+            android:title="@string/local_music"
+            />
+
+        <item android:id="@+id/search_in_net"
+            android:icon="@drawable/search_in_net"
+            android:title="@string/search_in_net"
+            />
+
+        <item android:id="@+id/music_nav_call"
+            android:icon="@drawable/back_up"
+            android:title="@string/back"/>
+    </group>
+
+</menu>

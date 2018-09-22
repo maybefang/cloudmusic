@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">自制云音乐</string>
+    <string name="music">音乐</string>
+    <string name="back">返回</string>
+    <string name="search_in_net">管乐网搜歌</string>
+    <string name="local_music">歌单</string>
+    <string name="load"><![CDATA[加载中>>>>>>>>]]></string>
+    <string name="list_create">创建歌单</string>
+    <string name="cover_edit">设置封面</string>
+    <string name="list_name">歌单名称</string>
+    <string name="author">创作者</string>
+    <string name="create_date">创作日期</string>
+    <string name="auto_generate">自动生成</string>
+    <string name="save">保存</string>
+    <string name="search">管乐网搜曲，直接输入曲名</string>
+    <string name="search1">搜索</string>
+    <string name="loading">数据加载中......</string>
+</resources>
