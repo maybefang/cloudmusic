@@ -43,6 +43,7 @@ public class NetMusicPager extends BasePage {
     private TextView cnbrass_text;
     private String string;
     private CnbrassAdapter adapter;
+    private ItemCnbrass itemCnbrass;
     private String data;
     private List<ItemCnbrass> cnbrassList = new ArrayList<>();
 
@@ -59,22 +60,26 @@ public class NetMusicPager extends BasePage {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ItemCnbrass itemCnbrass = new ItemCnbrass();
                 Connection connection = Jsoup.connect("http://www.cnbrass.com/search");
                 connection.data("keywords",values);
                 try {
                     Document document = connection.post();
+                    String name = null;
                     Elements elements1 = document.getElementsByTag("a");
                     for (Element element : elements1) {
                         string = element.absUrl("href");
                         if (string.contains("http://www.cnbrass.com/score/")){
-                            String name = element.text();
+                            name = element.text();
                             if (name != null && !name.equals("")){
-                                itemCnbrass.setSrcName(name);
                                 break;
                             }
                         }
                     }
+                    if (name != null && !name.equals("")){
+                        itemCnbrass = new ItemCnbrass();
+                        itemCnbrass.setSrcName(name);
+                    }
+
                     Elements elements2 = document.getElementsByTag("img");
                     for (Element element : elements2) {
                         if (!element.absUrl("src").contains("http://f.cnbrass.com/p/image/")){
@@ -94,7 +99,9 @@ public class NetMusicPager extends BasePage {
                     if (!cnbrassList.isEmpty()){
                         cnbrassList.clear();
                     }
-                    cnbrassList.add(itemCnbrass);
+                    if (itemCnbrass != null){
+                        cnbrassList.add(itemCnbrass);
+                    }
                     handler.sendEmptyMessage(FLUSH);
                 } catch (IOException e) {
                     e.printStackTrace();
