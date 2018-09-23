@@ -41,11 +41,13 @@ public class NetMusicPager extends BasePage {
     private Button begin_search;
     private ProgressBar cnbrass_progress_bar;
     private TextView cnbrass_text;
-    private String string;
     private CnbrassAdapter adapter;
     private ItemCnbrass itemCnbrass;
     private String data;
     private List<ItemCnbrass> cnbrassList = new ArrayList<>();
+    private List<String> imgScoreUrl = new ArrayList<>();
+    private List<String> scoreName = new ArrayList<>();
+    private List<String> scoreUrl = new ArrayList<>();
 
     public NetMusicPager(Context context) {
         super(context);
@@ -64,43 +66,43 @@ public class NetMusicPager extends BasePage {
                 connection.data("keywords",values);
                 try {
                     Document document = connection.post();
-                    String name = null;
-                    Elements elements1 = document.getElementsByTag("a");
-                    for (Element element : elements1) {
-                        string = element.absUrl("href");
-                        if (string.contains("http://www.cnbrass.com/score/")){
-                            name = element.text();
-                            if (name != null && !name.equals("")){
-                                break;
+                    Elements elements1 = document.select("div.a-photo");
+                    if (!cnbrassList.isEmpty() || !scoreName.isEmpty()){
+                        cnbrassList.clear();
+                        imgScoreUrl.clear();
+                        scoreName.clear();
+                        scoreUrl.clear();
+                    }
+                    for (Element newsHeadline : elements1) {
+                        Elements elements2 = newsHeadline.select("img");
+                        for (Element element : elements2) {
+                            imgScoreUrl.add(element.absUrl("src"));
+                            scoreName.add(element.attr("title"));
+                        }
+                        Elements elementsSecond = newsHeadline.select("a");
+                        for (Element element : elementsSecond) {
+                            if (element.absUrl("href").contains("http://www.cnbrass.com/score/")){
+                                scoreUrl.add(element.absUrl("href"));
                             }
                         }
                     }
-                    if (name != null && !name.equals("")){
+                    for (int i = 0; i < scoreName.size(); i++) {
                         itemCnbrass = new ItemCnbrass();
-                        itemCnbrass.setSrcName(name);
-                    }
-
-                    Elements elements2 = document.getElementsByTag("img");
-                    for (Element element : elements2) {
-                        if (!element.absUrl("src").contains("http://f.cnbrass.com/p/image/")){
-                            itemCnbrass.setImageUrl(element.absUrl("src"));
+                        itemCnbrass.setImageUrl(imgScoreUrl.get(i));
+                        itemCnbrass.setSrcName(scoreName.get(i));
+                        Document document1 = Jsoup.connect(scoreUrl.get(i)).get();
+                        Elements elements = document1.getElementsByTag("a");
+                        for (Element headline : elements) {
+                            String string = headline.absUrl("href");
+                            if (string.contains(".mp3") || string.contains(".MP3")){
+                                string = "http://f.cnbrass.com/a/" + string.split("/a/")[1];
+                                itemCnbrass.setDataUrl(string);
+                                break;
+                            }
                         }
-                    }
-                    Document document1 = Jsoup.connect(string).get();
-                    Elements newHeadlines = document1.getElementsByTag("a");
-                    for (Element headline : newHeadlines) {
-                        string = headline.absUrl("href");
-                        if (string.contains(".mp3")){
-                            string = "http://f.cnbrass.com/a/" + string.split("/a/")[1];
-                            itemCnbrass.setDataUrl(string);
+                        if (itemCnbrass != null){
+                            cnbrassList.add(itemCnbrass);
                         }
-
-                    }
-                    if (!cnbrassList.isEmpty()){
-                        cnbrassList.clear();
-                    }
-                    if (itemCnbrass != null){
-                        cnbrassList.add(itemCnbrass);
                     }
                     handler.sendEmptyMessage(FLUSH);
                 } catch (IOException e) {
