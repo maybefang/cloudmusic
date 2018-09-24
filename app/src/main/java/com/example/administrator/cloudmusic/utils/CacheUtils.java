@@ -16,4 +16,5 @@ public class CacheUtils {
         return preferences.getInt(key,1);
     }
 
+
 }
