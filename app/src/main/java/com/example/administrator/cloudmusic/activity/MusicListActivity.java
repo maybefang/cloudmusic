@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -30,6 +31,8 @@ import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +63,9 @@ public class MusicListActivity extends AppCompatActivity {
         initData();
     }
     private void initData() {
+        if (mediaList != null && mediaList.size() > 0){
+            mediaList.clear();
+        }
         switch (id){
             default:
                 break;
@@ -74,6 +80,7 @@ public class MusicListActivity extends AppCompatActivity {
                 break;
         }
     }
+
 
     private void getDataFromCnbrass() {
         new Thread(new Runnable() {

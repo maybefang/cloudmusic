@@ -133,7 +133,7 @@ public class MusicPlayer extends AppCompatActivity implements View.OnClickListen
 
                             service.open();
                         }
-                    }else {
+                    } else {
                         service.resume();
                         music_total_time.setText(TimeFormat.toTime2(service.getDuration()));
                         music_play_seekbar.setMax((int) service.getDuration());
@@ -390,6 +390,7 @@ public class MusicPlayer extends AppCompatActivity implements View.OnClickListen
         if (service != null) {
             service = null;
         }
+        CacheUtils.putString(this,"cover_id",coverId);
         handler.removeCallbacksAndMessages(null);
         EventBus.getDefault().unregister(this);
         super.onDestroy();
@@ -409,6 +410,7 @@ public class MusicPlayer extends AppCompatActivity implements View.OnClickListen
         Intent intent = getIntent();
         mediaList = intent.getParcelableArrayListExtra("musiclist");
         isFromWidow = intent.getBooleanExtra("notification",false);
+        coverId = CacheUtils.getString(this,"cover_id");
         if (!isFromWidow){
             position =  intent.getIntExtra("position",0);
             coverId = intent.getIntExtra("list_cover",R.drawable.app_start);

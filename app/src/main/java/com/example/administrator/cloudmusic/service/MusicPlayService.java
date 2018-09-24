@@ -1,14 +1,18 @@
 package com.example.administrator.cloudmusic.service;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.widget.RemoteViews;
 
 import com.example.administrator.cloudmusic.IMusicPlayService;
 import com.example.administrator.cloudmusic.R;
@@ -20,9 +24,12 @@ import com.example.administrator.cloudmusic.utils.CacheUtils;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static android.app.Notification.VISIBILITY_SECRET;
 
 public class MusicPlayService extends Service {
     private static final int DEFAULT_PLAY_MODE = 1;
@@ -239,13 +246,43 @@ public class MusicPlayService extends Service {
             intent.putExtra("notification",true);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
             Notification notification = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            RemoteViews remoteViews = new RemoteViews(getPackageName(),R.layout.notification);
+            remoteViews.setTextViewText(R.id.music_name_notification,this.getMusicName());
+//            PendingIntent pendingIntent1 = new PendingIntent();
+//            remoteViews.setOnClickPendingIntent(R.id.play_after_notification,);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                NotificationChannel channel = new NotificationChannel("channel_id","channel_name",NotificationManager.IMPORTANCE_DEFAULT);
+                channel.canBypassDnd();
+                channel.enableLights(false);
+                channel.setLockscreenVisibility(VISIBILITY_SECRET);
+                channel.enableVibration(false);
+                channel.setBypassDnd(true);
+                manager.createNotificationChannel(channel);
                 notification = new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.app_start)
-                        .setContentTitle("自制云音乐")
-                        .setContentText("正在播放" + getMusicName())
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setChannelId("channel_id")
                         .setContentIntent(pendingIntent)
+                        .setStyle(new Notification.MediaStyle())
+                        .setAutoCancel(false)
+                        .setContentTitle("云音乐播放中....")
+                        .setContentText(this.getMusicName())
+//                        .setCustomBigContentView(remoteViews)
+                        .setOngoing(true)
                         .build();
+            }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    notification = new Notification.Builder(this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(false)
+                            .setOngoing(true)
+                            .setContentTitle("云音乐播放中....")
+                            .setContentText(this.getMusicName())
+                            .build();
+//                    notification.bigContentView = remoteViews;
+//                    notification.contentView = remoteViews;
+                }
             }
             manager.notify(1,notification);
             CacheUtils.putString(MusicPlayService.this,"position",position);
